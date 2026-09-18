@@ -119,3 +119,98 @@ jobs:
 
       - name: Vet Go
         run: go vet ./...
+
+  # Landing page job: the static marketing site under landing-page/ is its
+  # own Cloudflare Pages project. This job only sanity-checks those static
+  # files — no Go, no web/ build, no coupling to the embedded frontend.
+  landing-page:
+    name: Landing page — static sanity
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify entrypoint and required files
+        run: |
+          set -euo pipefail
+          test -f landing-page/index.html
+          for f in styles.css script.js assets/favicon.svg; do
+            test -f "landing-page/$f" || { echo "missing landing-page/$f"; exit 1; }
+          done
+
+      - name: Static-site sanity check
+        run: |
+          set -euo pipefail
+          # Well-formed HTML (tag balance) and every local asset referenced
+          # from index.html must exist. Python stdlib only.
+          python3 - <<'PY'
+          import html.parser, os, re, sys
+          root = 'landing-page'
+          class Checker(html.parser.HTMLParser):
+              VOID = {'area','base','br','col','embed','hr','img','input',
+                      'link','meta','source','track','wbr'}
+              def __init__(self):
+                  super().__init__(convert_charrefs=True)
+                  self.stack, self.errors = [], []
+              def handle_starttag(self, tag, attrs):
+                  if tag not in self.VOID:
+                      self.stack.append(tag)
+              def handle_endtag(self, tag):
+                  if tag in self.VOID:
+                      return
+                  if self.stack and self.stack[-1] == tag:
+                      self.stack.pop()
+                  elif tag in self.stack:
+                      while self.stack and self.stack[-1] != tag:
+                          self.errors.append('unclosed <%s>' % self.stack.pop())
+                      self.stack.pop()
+                  else:
+                      self.errors.append('stray </%s>' % tag)
+          with open(os.path.join(root, 'index.html'), encoding='utf-8') as fh:
+              html_text = fh.read()
+          c = Checker()
+          c.feed(html_text)
+          c.close()
+          errors = c.errors + ['unclosed <%s> at EOF' % t for t in c.stack]
+          missing = []
+          for ref in set(re.findall(r'(?:src|href)="([^"]+)"', html_text)):
+              if ref.startswith(('http://', 'https://', 'mailto:', '#', 'data:')):
+                  continue
+              path = ref.split('#')[0].split('?')[0]
+              if path.startswith('./'):
+                  path = path[2:]
+              if path and not os.path.isfile(os.path.join(root, path)):
+                  missing.append(ref)
+          if errors or missing:
+              for e in errors:
+                  print('HTML error:', e)
+              for m in missing:
+                  print('Missing local asset:', m)
+              sys.exit(1)
+          print('landing-page: HTML tag balance OK, all local assets present')
+          PY
+          # Isolation: the marketing site must stay framework/Go-free.
+          # (grep the actual code files only — not prose in README.md)
+          if grep -rn 'go:embed' landing-page; then
+            echo "landing-page must not contain go:embed"
+            exit 1
+          fi
+          if grep -nE "from ['\"]react['\"]|require\(['\"]react['\"]\)|/@vite|/@fs" \
+              landing-page/index.html landing-page/script.js; then
+            echo "landing-page must not reference React or Vite dev-server paths"
+            exit 1
+          fi
+          if test -f landing-page/package.json || test -d landing-page/node_modules; then
+            echo "landing-page must have no build system (package.json/node_modules)"
+            exit 1
+          fi
+          echo "landing-page isolation checks passed"
+
+      - name: Set up Node (static checks only)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: JavaScript syntax check
+        run: node --check landing-page/script.js
