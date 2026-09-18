@@ -1,8 +1,10 @@
 // Package cli implements the command-line interface. All commands operate the
 // same engine services as the browser GUI - there is no second FTP/SFTP
-// implementation. `start` launches the local server; one-shot commands
-// (connect, ls, put, get, mkdir, rm, mv) spin up the engine in-process,
-// perform the work using the shared connection/transfer managers, then exit.
+// implementation. Running the binary with no arguments opens the interactive
+// TUI launcher (the native front door); `start` launches the local server
+// directly; one-shot commands (connect, ls, put, get, mkdir, rm, mv) spin up
+// the engine in-process, perform the work using the shared
+// connection/transfer managers, then exit.
 package cli
 
 import (
@@ -13,8 +15,11 @@ import (
 	"strings"
 	"syscall"
 
+	"golang.org/x/term"
+
 	"remorasftp/internal/app"
 	"remorasftp/internal/browser"
+	"remorasftp/internal/tui"
 	"remorasftp/internal/version"
 )
 
@@ -177,7 +182,17 @@ func Execute() error {
 	}
 	args := os.Args[1:]
 	if len(args) == 0 {
-		// Double-click / no args: behave like `start` with browser open.
+		// No arguments: open the interactive TUI launcher when attached to a
+		// terminal. In non-interactive contexts (piped stdin, CI, double-click
+		// on Windows without a console) fall back to the classic behavior:
+		// start the engine directly.
+		if tuiWanted() {
+			if err := tui.Run(os.Stdin, os.Stdout); err != nil {
+				fmt.Fprintln(os.Stderr, "remorasftp: TUI unavailable ("+err.Error()+") - starting the engine directly.")
+			} else {
+				return nil
+			}
+		}
 		return runStart(nil, &Flags{bools: map[string]bool{}, values: map[string]string{}})
 	}
 	cmdName := args[0]
@@ -223,6 +238,16 @@ func Execute() error {
 	return nil
 }
 
+// tuiWanted reports whether the interactive TUI launcher should be used when
+// the binary runs with no arguments. The launcher needs a real terminal on
+// stdin; set REMORASFTP_NO_TUI=1 to force the classic direct-start behavior.
+func tuiWanted() bool {
+	if os.Getenv("REMORASFTP_NO_TUI") == "1" {
+		return false
+	}
+	return term.IsTerminal(int(os.Stdin.Fd()))
+}
+
 func envOrFlagDataDir() string {
 	for _, a := range os.Args[1:] {
 		if strings.HasPrefix(a, "--data-dir=") {
@@ -250,7 +275,9 @@ func runHelp(args []string, _ *Flags) error {
 	fmt.Println()
 	fmt.Println("The engine runs entirely on this device. The browser is only the UI.")
 	fmt.Println()
-	fmt.Println("Usage: remorasftp <command> [flags]")
+	fmt.Println("Usage:")
+	fmt.Println("  remorasftp                interactive TUI launcher (control center)")
+	fmt.Println("  remorasftp <command> [flags]")
 	fmt.Println()
 	fmt.Println("Commands:")
 	for _, c := range commands() {
@@ -259,6 +286,9 @@ func runHelp(args []string, _ *Flags) error {
 	fmt.Println()
 	fmt.Println("Global flags:")
 	fmt.Println("  --data-dir=<path>   override the application data directory")
+	fmt.Println()
+	fmt.Println("Environment:")
+	fmt.Println("  REMORASFTP_NO_TUI=1 run the classic engine directly instead of the TUI")
 	fmt.Println()
 	fmt.Printf("Version: %s (%s)\n", version.Version, version.Commit)
 	return nil

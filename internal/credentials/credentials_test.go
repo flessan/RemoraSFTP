@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -51,9 +52,15 @@ func TestFileProviderRoundTrip(t *testing.T) {
 		if containsAll(raw, []byte("hunter2"), []byte("BEGIN PRIVATE"), []byte("s3cr3t")) {
 			t.Errorf("plaintext secret found in %s", e.Name())
 		}
-		info, _ := e.Info()
-		if info.Mode().Perm() != 0o600 {
-			t.Errorf("%s has perms %o, want 0600", e.Name(), info.Mode().Perm())
+		// POSIX permission bits are only meaningful on Unix-like systems.
+		// On Windows the OS ignores them (NTFS ACLs apply instead), so the
+		// 0600 assertion is only enforced there; encryption and
+		// round-trip guarantees are checked on every platform above.
+		if runtime.GOOS != "windows" {
+			info, _ := e.Info()
+			if info.Mode().Perm() != 0o600 {
+				t.Errorf("%s has perms %o, want 0600", e.Name(), info.Mode().Perm())
+			}
 		}
 	}
 

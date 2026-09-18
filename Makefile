@@ -4,7 +4,7 @@
 #   make build    build the single executable with embedded UI
 #   make dev      run the Go engine (use `make web-dev` for the Vite dev server)
 #   make web-dev  run the Vite dev server with /api proxied to the engine
-#   make test     run all Go tests
+#   make test     build the embedded UI, then run all Go tests
 #   make lint     go vet + gofmt check + frontend typecheck
 #   make fmt      format Go and TypeScript sources
 #   make clean    remove build artifacts
@@ -21,10 +21,16 @@ LDFLAGS := -X remorasftp/internal/version.Version=$(VERSION) \
 
 all: web build
 
+# npm ci (not npm install): deterministic install from package-lock.json,
+# which also repairs a missing/partial node_modules (e.g. a fresh checkout
+# on another machine). The build output lands in internal/server/webassets,
+# where //go:embed captures it at Go compile time.
 web:
-	cd web && npm install --no-audit --no-fund && npm run build
+	cd web && npm ci --no-audit --no-fund && npm run build
 
-build:
+# build depends on web: the binary embeds internal/server/webassets at
+# compile time, so a stale or missing frontend would ship in the binary.
+build: web
 	$(GO) build -trimpath -ldflags "$(LDFLAGS) -s -w" -o dist/remorasftp ./cmd/remorasftp
 
 # Cross-compilation targets.
@@ -35,10 +41,13 @@ build-macos: web
 build-linux: web
 	GOOS=linux GOARCH=amd64 $(GO) build -trimpath -ldflags "$(LDFLAGS) -s -w" -o dist/remorasftp-linux-amd64 ./cmd/remorasftp
 
-test:
+# test depends on web: internal/server embeds webassets/ at compile time,
+# so the SPA tests need a real index.html in the embed tree. `npm ci`
+# inside the web target repairs a missing node_modules first.
+test: web
 	$(GO) test ./... -count=1
 
-test-race:
+test-race: web
 	$(GO) test -race ./... -count=1
 
 dev:

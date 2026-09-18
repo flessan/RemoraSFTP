@@ -1,6 +1,7 @@
 // Package server hosts the embedded browser UI and the local HTTP/WebSocket
 // API of the SftpBox engine.
 package server
+
 import (
 	"embed"
 	"io"
@@ -8,12 +9,15 @@ import (
 	"net/http"
 	"strings"
 )
+
 //go:embed all:webassets
 var embedded embed.FS
+
 // webAssets returns the rooted filesystem for the built UI.
 func webAssets() (fs.FS, error) {
 	return fs.Sub(embedded, "webassets")
 }
+
 // cspForApp is the restrictive Content-Security-Policy applied to the app
 // shell. Everything (scripts, styles, workers) is served from the loopback
 // origin itself; no remote origins are allowed.
@@ -33,6 +37,7 @@ func cspForApp() string {
 		"frame-ancestors 'none'",
 	}, "; ")
 }
+
 // spaHandler serves the built single-page application.
 //
 // The browser opens client-side routes directly — the launcher hands it a
@@ -43,6 +48,7 @@ func cspForApp() string {
 type spaHandler struct {
 	assets fs.FS
 }
+
 func (h *spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet && r.Method != http.MethodHead {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)

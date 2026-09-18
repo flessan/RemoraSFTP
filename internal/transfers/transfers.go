@@ -33,6 +33,8 @@ type Direction string
 const (
 	Upload   Direction = "upload"
 	Download Direction = "download"
+	Copy     Direction = "copy"
+	Move     Direction = "move"
 )
 
 // Status of a transfer job.
@@ -56,7 +58,10 @@ type Job struct {
 	SessionID  string    `json:"sessionId"`
 	ConnName   string    `json:"connectionName"`
 	RemotePath string    `json:"remotePath"`
-	Name       string    `json:"name"`
+	// From is the source path for copy/move operations.
+	From string `json:"from,omitempty"`
+	Name string `json:"name"`
+
 	LocalPath  string    `json:"localPath,omitempty"`
 	Total      int64     `json:"total"`
 	Done       int64     `json:"done"`
@@ -76,6 +81,9 @@ type Job struct {
 	cancel     context.CancelFunc
 	openReader func(ctx context.Context, offset int64) (io.ReadCloser, error)
 	openWriter func(ctx context.Context, offset int64) (io.WriteCloser, error)
+	// openOperation is the body of an operation job (server-side copy/move
+	// trees). It carries its own clients in a closure.
+	openOperation RunFunc
 	// cleanup is invoked once when a job reaches a terminal state, used to
 	// remove partial files etc.
 	cleanup func()
@@ -205,6 +213,20 @@ func (tm *Manager) EnqueueDownload(j *Job, openWriter func(ctx context.Context, 
 	return tm.enqueue(j)
 }
 
+// RunFunc is the body of an operation job (server-side copy/move trees).
+// prog reports cumulative bytes moved (monotonic); ctx is canceled when the
+// job is canceled and must be checked between items.
+type RunFunc func(ctx context.Context, prog protocol.ProgressFunc) error
+
+// EnqueueOperation queues an operation job (copy/move). j.Total is the
+// expected number of bytes moved, or 0 for indeterminate progress.
+func (tm *Manager) EnqueueOperation(j *Job, run RunFunc) *Job {
+	j.Status = StatusQueued
+	j.openOperation = run
+	j.QueuedAt = time.Now().UTC()
+	return tm.enqueue(j)
+}
+
 func newJob() *Job {
 	return &Job{done: make(chan struct{})}
 }
@@ -291,21 +313,28 @@ func (tm *Manager) run(id string) {
 	tm.emit(j)
 
 	var cl protocol.Client
-	if tm.clientOverride != nil {
-		cl = tm.clientOverride
-	} else {
-		var err error
-		cl, err = tm.mgr.Client(j.SessionID)
-		if err != nil {
-			tm.fail(j, err)
-			return
+	if j.openOperation == nil {
+		if tm.clientOverride != nil {
+			cl = tm.clientOverride
+		} else {
+			var err error
+			cl, err = tm.mgr.Client(j.SessionID)
+			if err != nil {
+				tm.fail(j, err)
+				return
+			}
 		}
 	}
 
 	prog := tm.progressFunc(j)
 
 	var progErr error
-	if j.Direction == Upload {
+	switch {
+	case j.openOperation != nil:
+		// Operation jobs (copy/move trees) carry their own clients in the
+		// closure; no session lookup is needed.
+		progErr = j.openOperation(ctx, prog)
+	case j.Direction == Upload:
 		rc, err := j.openReader(ctx, atomic.LoadInt64(&j.Done))
 		if err != nil {
 			tm.fail(j, err)
@@ -314,7 +343,7 @@ func (tm *Manager) run(id string) {
 		// Ensure the source (HTTP body / file) is always closed.
 		progErr = cl.Upload(ctx, j.RemotePath, rc, atomic.LoadInt64(&j.Done), prog)
 		_ = rc.Close()
-	} else {
+	default:
 		wc, err := j.openWriter(ctx, atomic.LoadInt64(&j.Done))
 		if err != nil {
 			tm.fail(j, err)
@@ -354,10 +383,17 @@ func (tm *Manager) run(id string) {
 }
 
 func mapDir(d Direction) string {
-	if d == Upload {
+	switch d {
+	case Upload:
 		return "upload"
+	case Download:
+		return "download"
+	case Copy:
+		return "copy"
+	case Move:
+		return "move"
 	}
-	return "download"
+	return "transfer"
 }
 
 // progressFunc returns a throttled progress callback. The accompanying ticker
@@ -445,6 +481,7 @@ type JobSnapshot struct {
 	SessionID  string    `json:"sessionId"`
 	ConnName   string    `json:"connectionName"`
 	RemotePath string    `json:"remotePath"`
+	From       string    `json:"from,omitempty"`
 	Name       string    `json:"name"`
 	LocalPath  string    `json:"localPath,omitempty"`
 	Total      int64     `json:"total"`
@@ -464,7 +501,7 @@ func snapshot(j *Job) JobSnapshot {
 	defer j.mu.Unlock()
 	return JobSnapshot{
 		ID: j.ID, Direction: j.Direction, Status: j.Status, SessionID: j.SessionID,
-		ConnName: j.ConnName, RemotePath: j.RemotePath, Name: j.Name, LocalPath: j.LocalPath,
+		ConnName: j.ConnName, RemotePath: j.RemotePath, From: j.From, Name: j.Name, LocalPath: j.LocalPath,
 		Total: j.Total, Done: atomic.LoadInt64(&j.Done), Error: j.Error, Attempts: j.Attempts,
 		QueuedAt: j.QueuedAt, StartedAt: j.StartedAt, FinishedAt: j.FinishedAt,
 		Speed: atomic.LoadInt64(&j.Speed), ETASeconds: atomic.LoadInt64(&j.ETASeconds),
@@ -538,7 +575,7 @@ func (tm *Manager) Retry(id string) (*Job, error) {
 		j.mu.Unlock()
 		return nil, errors.New("transfer is already active")
 	}
-	if j.openReader == nil && j.openWriter == nil {
+	if j.openReader == nil && j.openWriter == nil && j.openOperation == nil {
 		j.mu.Unlock()
 		return nil, errors.New("browser transfers cannot be retried automatically; please repeat the action")
 	}
@@ -548,11 +585,7 @@ func (tm *Manager) Retry(id string) (*Job, error) {
 	j.Error = ""
 	j.FinishedAt = time.Time{}
 	j.Status = StatusQueued
-	hasReader := j.openReader != nil
-	hasWriter := j.openWriter != nil
 	j.mu.Unlock()
-	_ = hasReader
-	_ = hasWriter
 	tm.mu.Lock()
 	tm.queue = append(tm.queue, j.ID)
 	tm.mu.Unlock()
@@ -739,7 +772,7 @@ func (p *partFile) Commit() error {
 		_ = os.RemoveAll(p.jobDir)
 		return err
 	}
-	if err := moveFile(p.part, p.final); err != nil {   // cross-fs safe
+	if err := moveFile(p.part, p.final); err != nil { // cross-fs safe
 		_ = os.Remove(p.part)
 		_ = os.RemoveAll(p.jobDir)
 		return err

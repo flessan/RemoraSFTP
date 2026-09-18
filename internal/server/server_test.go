@@ -130,7 +130,7 @@ func TestConnectionProfileDoesNotLeakSecret(t *testing.T) {
 	do := func(method, path, body string) *http.Response {
 		req, _ := http.NewRequest(method, base+path, strings.NewReader(body))
 		req.Header.Set("Authorization", "Bearer "+token)
-		req.Header.Set("X-Requested-With", "SftpBox") // required for non-GET
+		req.Header.Set("X-Requested-With", "RemoraSFTP") // required for non-GET
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
@@ -207,7 +207,10 @@ func TestSPAFallbackForClientRoutes(t *testing.T) {
 		body, _ := io.ReadAll(resp.Body)
 		resp.Body.Close()
 		if resp.StatusCode != http.StatusOK {
-			t.Fatalf("GET %s: status %d, want 200 (SPA fallback)", route, resp.StatusCode)
+			// The body carries the actionable diagnosis when the built UI
+			// is absent from the embed (503 + instructions).
+			t.Fatalf("GET %s: status %d, want 200 (SPA fallback); body: %s",
+				route, resp.StatusCode, truncate(string(body), 160))
 		}
 		if !strings.Contains(string(body), `<div id="root">`) {
 			t.Fatalf("GET %s: expected SPA index.html, body started %q",

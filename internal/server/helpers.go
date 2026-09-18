@@ -43,8 +43,13 @@ func decodeBody(w http.ResponseWriter, r *http.Request, v any) error {
 	return dec.Decode(v)
 }
 
-// pathTail returns the part of r.URL.Path after prefix, split by "/".
+// pathTail returns the part of path after prefix, split by "/". If path is
+// not longer than prefix (e.g. a subtree pattern matched the bare path),
+// it returns an empty slice instead of indexing out of range.
 func pathTail(prefix, path string) []string {
+	if len(path) < len(prefix) {
+		return []string{}
+	}
 	tail := path[len(prefix):]
 	out := []string{}
 	cur := ""

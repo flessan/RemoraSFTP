@@ -1,8 +1,8 @@
 <div align="center">
 
-# RemoraSFTP
-
 ![RemoraSFTP Logo](./docs/RemoraSFTP.jpg)
+
+# 🐟 RemoraSFTP
 
 **A local-first browser file manager for FTP, FTPS, and SFTP.**
 
@@ -127,9 +127,23 @@ make web          # build frontend -> internal/server/webassets
 make build        # build the release binary (with ldflags metadata)
 make dev          # run the engine on http://127.0.0.1:7970 (no browser)
 make web-dev      # Vite dev server (hot reload) with /api proxied to the engine
-make test         # run all Go tests
+make test         # build the embedded UI, then run all Go tests
 make test-race    # tests with -race
 make lint         # go vet + gofmt + frontend typecheck
+```
+
+`make test` and `make build` build the frontend first, because the server
+package embeds `internal/server/webassets` at compile time — the SPA tests
+and the shipped UI need a real `index.html` in that tree. On a fresh
+checkout (or any machine with a missing/partial `node_modules`), use
+`npm ci` before building so dependencies are installed from the lockfile:
+
+```
+cd web
+npm ci
+npm run build
+cd ..
+go test ./... -count=1
 ```
 
 Recommended development loop:

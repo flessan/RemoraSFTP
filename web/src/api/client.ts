@@ -52,7 +52,7 @@ async function request<T = unknown>(
   method: string,
   path: string,
   body?: unknown,
-  opts: { raw?: BodyInit; headers?: Record<string, string> } = {},
+  opts: { raw?: BodyInit; headers?: Record<string, string>; signal?: AbortSignal } = {},
 ): Promise<T> {
   const headers: Record<string, string> = {
     Accept: 'application/json',
@@ -70,7 +70,7 @@ async function request<T = unknown>(
     payload = JSON.stringify(body);
   }
 
-  const res = await fetch(path, { method, headers, body: payload });
+  const res = await fetch(path, { method, headers, body: payload, signal: opts.signal });
   const ct = res.headers.get('content-type') ?? '';
   if (!res.ok) {
     let data: unknown = null;
@@ -193,6 +193,34 @@ export const api = {
   chmod(sessionId: string, path: string, mode: string) {
     return request('POST', `/api/sessions/${sessionId}/chmod`, { path, mode });
   },
+  copy(sessionId: string, from: string, to: string, move: boolean, policy: string) {
+    return request<{ job: TransferJob }>('POST', `/api/sessions/${sessionId}/copy`, {
+      from,
+      to,
+      move,
+      policy,
+    });
+  },
+  search(
+    sessionId: string,
+    q: {
+      path: string;
+      query?: string;
+      startsWith?: boolean;
+      extension?: string;
+      caseSensitive?: boolean;
+      includeHidden?: boolean;
+      recursive?: boolean;
+    },
+    signal?: AbortSignal,
+  ) {
+    return request<{ results: Entry[]; count: number; canceled: boolean }>(
+      'POST',
+      `/api/sessions/${sessionId}/search`,
+      { ...q },
+      { signal },
+    );
+  },
 
   // --- upload / download / preview ---
   uploadUrl(sessionId: string, dir: string, name: string) {
@@ -218,6 +246,56 @@ export const api = {
   },
   async previewText(sessionId: string, path: string) {
     return request<PreviewResponse>('GET', this.previewUrl(sessionId, path));
+  },
+
+  // --- favorites / recents ---
+  favorites() {
+    return request<{ favorites: Favorite[] }>('GET', '/api/favorites');
+  },
+  addFavorite(f: { connectionId: string; path: string; label?: string; kind?: string }) {
+    return request<{ favorite: Favorite }>('POST', '/api/favorites', f);
+  },
+  removeFavorite(id: string) {
+    return request('DELETE', `/api/favorites/${encodeURIComponent(id)}`);
+  },
+  recents() {
+    return request<{
+      files: RecentFileItem[];
+      dirs: { connectionId: string; path: string; visitedAt: string }[];
+    }>('GET', '/api/recents');
+  },
+  addRecent(f: { connectionId: string; path: string; kind: 'file' | 'dir' }) {
+    return request('POST', '/api/recents', f);
+  },
+
+  // --- local filesystem ---
+  localHome() {
+    return request<{ home: string }>('GET', '/api/local');
+  },
+  localList(path?: string) {
+    const q = path ? `?path=${encodeURIComponent(path)}` : '';
+    return request<{ path: string; entries: Entry[] }>('GET', `/api/local/list${q}`);
+  },
+  localStat(path: string) {
+    return request<{ entry: Entry }>('GET', `/api/local/stat?path=${encodeURIComponent(path)}`);
+  },
+  localMkdir(path: string) {
+    return request('POST', '/api/local/mkdir', { path });
+  },
+  localRemove(path: string, recursive: boolean) {
+    return request('POST', '/api/local/remove', { path, recursive });
+  },
+  localRename(from: string, to: string) {
+    return request('POST', '/api/local/rename', { from, to });
+  },
+  localCopy(from: string, to: string, move: boolean, policy: string) {
+    return request('POST', '/api/local/copy', { from, to, move, policy });
+  },
+  localDownloadUrl(path: string) {
+    return `/api/local/download?path=${encodeURIComponent(path)}`;
+  },
+  localUploadUrl(dir: string, name: string) {
+    return `/api/local/upload?dir=${encodeURIComponent(dir)}&name=${encodeURIComponent(name)}`;
   },
 
   // --- trust ---
@@ -265,6 +343,21 @@ export { ApiError, clearToken };
 
 // ---- shared types ----
 export type Protocol = 'ftp' | 'ftps' | 'sftp';
+
+export interface Favorite {
+  id: string;
+  connectionId: string;
+  path: string;
+  label: string;
+  kind: 'file' | 'dir';
+  createdAt: string;
+}
+
+export interface RecentFileItem {
+  connectionId: string;
+  path: string;
+  openedAt: string;
+}
 export type AuthMethod = 'password' | 'key' | 'keyagent' | 'none';
 
 export interface ConnectionSettings {
@@ -353,11 +446,12 @@ export type TransferStatus =
 
 export interface TransferJob {
   id: string;
-  direction: 'upload' | 'download';
+  direction: 'upload' | 'download' | 'copy' | 'move';
   status: TransferStatus;
   sessionId: string;
   connectionName?: string;
   remotePath: string;
+  from?: string;
   name: string;
   total: number;
   done: number;
@@ -384,9 +478,10 @@ export interface ActivityEntry {
 export interface Settings {
   language: string;
   theme: 'system' | 'light' | 'dark';
-  defaultView: 'list' | 'grid';
+  defaultView: 'details' | 'list' | 'largeIcons' | 'mediumIcons' | 'smallIcons' | 'grid';
   showHidden: boolean;
   confirmDeletes: boolean;
+  startupMode?: 'ask' | 'browser' | 'no-browser';
   openBrowserOnStart: boolean;
   concurrentTransfers: number;
   remoteAccess: boolean;

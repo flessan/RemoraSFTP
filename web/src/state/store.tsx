@@ -176,8 +176,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const connectEvents = useCallback(() => {
     const proto = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const url = `${proto}://${window.location.host}/api/events`;
-    const token = sessionStorage.getItem('sftpbox.token');
-    const ws = new WebSocket(url, token ? ['sftpbox', `sftpbox.${token}`] : ['sftpbox']);
+    const token = sessionStorage.getItem('remorasftp.token');
+    const ws = new WebSocket(url, token ? [`remorasftp.${token}`] : ['remorasftp']);
     wsRef.current = ws;
     ws.onmessage = (ev) => {
       try {
@@ -244,7 +244,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     ws.onclose = () => {
       // Reconnect after a short delay, unless the engine is gone.
       setTimeout(() => {
-        if (document.visibilityState !== 'hidden' && sessionStorage.getItem('sftpbox.token')) {
+        if (document.visibilityState !== 'hidden' && sessionStorage.getItem('remorasftp.token')) {
           connectEvents();
         }
       }, 3000);

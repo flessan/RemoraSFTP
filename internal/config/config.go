@@ -23,7 +23,7 @@ import (
 )
 
 // CurrentSchemaVersion is bumped whenever the on-disk shape changes.
-const CurrentSchemaVersion = 1
+const CurrentSchemaVersion = 2
 
 // Protocol identifies a remote file protocol.
 type Protocol string
@@ -85,10 +85,11 @@ type ConnectionSettings struct {
 type Settings struct {
 	Language            string `json:"language"`    // "en" (default), "id", ...
 	Theme               string `json:"theme"`       // "system" | "light" | "dark"
-	DefaultView         string `json:"defaultView"` // "list" | "grid"
+	DefaultView         string `json:"defaultView"` // "details" | "list" | "icons"
 	ShowHidden          bool   `json:"showHidden"`
 	ConfirmDeletes      bool   `json:"confirmDeletes"`
 	OpenBrowserOnStart  bool   `json:"openBrowserOnStart"`
+	StartupMode         string `json:"startupMode"`         // "ask" | "browser" | "no-browser"
 	ConcurrentTransfers int    `json:"concurrentTransfers"` // worker count
 	RemoteAccess        bool   `json:"remoteAccess"`        // advanced: bind beyond loopback
 	ListenAddress       string `json:"listenAddress"`       // default "127.0.0.1"
@@ -100,20 +101,40 @@ func defaultSettings() Settings {
 	return Settings{
 		Language:            "en",
 		Theme:               "system",
-		DefaultView:         "list",
+		DefaultView:         "details",
 		ConfirmDeletes:      true,
 		OpenBrowserOnStart:  true,
+		StartupMode:         "ask",
 		ConcurrentTransfers: 3,
 		ListenAddress:       "127.0.0.1",
 		LogLevel:            "info",
 	}
 }
 
-// RecentLocation is a breadcrumb-history entry.
+// RecentLocation is a breadcrumb-history entry (recently visited
+// directories, per connection).
 type RecentLocation struct {
 	ConnectionID string    `json:"connectionId"`
 	Path         string    `json:"path"`
 	VisitedAt    time.Time `json:"visitedAt"`
+}
+
+// Favorite is a bookmarked remote path. Paths never carry credentials; the
+// connection reference resolves credentials through the credential vault at
+// connect time only.
+type Favorite struct {
+	ID           string    `json:"id"`
+	ConnectionID string    `json:"connectionId"`
+	Path         string    `json:"path"`
+	Label        string    `json:"label,omitempty"`
+	CreatedAt    time.Time `json:"createdAt"`
+}
+
+// RecentFile is a recently opened file (for the Recent section).
+type RecentFile struct {
+	ConnectionID string    `json:"connectionId"`
+	Path         string    `json:"path"`
+	OpenedAt     time.Time `json:"openedAt"`
 }
 
 // Root is the serialized config document.
@@ -122,6 +143,8 @@ type Root struct {
 	Connections   []*Connection    `json:"connections"`
 	Settings      Settings         `json:"settings"`
 	Recents       []RecentLocation `json:"recents"`
+	Favorites     []Favorite       `json:"favorites"`
+	RecentFiles   []RecentFile     `json:"recentFiles"`
 	Onboarded     bool             `json:"onboarded"`
 }
 
@@ -170,8 +193,11 @@ func (s *Store) migrate() error {
 	if v > CurrentSchemaVersion {
 		return fmt.Errorf("config schema version %d is newer than this release supports (%d); please update RemoraSFTP", v, CurrentSchemaVersion)
 	}
-	// Version 1 is the initial schema. Add future cases here:
-	// case 1: ... transform ... ; v = 2
+	// Version 1 is the initial schema. Version 2 adds favorites and recent
+	// files (new optional fields; no data transformation required).
+	if v < CurrentSchemaVersion {
+		v = CurrentSchemaVersion
+	}
 	s.root.SchemaVersion = CurrentSchemaVersion
 	// Re-apply defaults for missing preference fields.
 	d := defaultSettings()
@@ -183,6 +209,11 @@ func (s *Store) migrate() error {
 	}
 	if s.root.Settings.DefaultView == "" {
 		s.root.Settings.DefaultView = d.DefaultView
+	}
+	// Legacy default views ("list"/"grid") remain valid; the UI maps "grid"
+	// to the icon views.
+	if s.root.Settings.StartupMode == "" {
+		s.root.Settings.StartupMode = d.StartupMode
 	}
 	if s.root.Settings.ConcurrentTransfers <= 0 {
 		s.root.Settings.ConcurrentTransfers = d.ConcurrentTransfers
@@ -333,6 +364,90 @@ func (s *Store) Onboarded() bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.root.Onboarded
+}
+
+// Favorites returns all bookmarks, most recently added first.
+func (s *Store) Favorites() []Favorite {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	out := make([]Favorite, len(s.root.Favorites))
+	copy(out, s.root.Favorites)
+	sort.Slice(out, func(i, j int) bool { return out[i].CreatedAt.After(out[j].CreatedAt) })
+	return out
+}
+
+// AddFavorite stores a bookmark. A bookmark for the same (connection, path)
+// is refreshed in place instead of duplicated. The caller supplies the ID
+// (generated outside this package).
+func (s *Store) AddFavorite(f Favorite) error {
+	if f.ConnectionID == "" || f.Path == "" {
+		return errors.New("favorite requires connectionId and path")
+	}
+	if f.ID == "" {
+		return errors.New("favorite id is required")
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for i, existing := range s.root.Favorites {
+		if existing.ConnectionID == f.ConnectionID && existing.Path == f.Path {
+			f.CreatedAt = existing.CreatedAt
+			s.root.Favorites[i] = f
+			return s.saveLocked()
+		}
+	}
+	f.CreatedAt = time.Now().UTC()
+	s.root.Favorites = append(s.root.Favorites, f)
+	return s.saveLocked()
+}
+
+// RemoveFavorite deletes a bookmark by ID.
+func (s *Store) RemoveFavorite(id string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	kept := s.root.Favorites[:0]
+	found := false
+	for _, f := range s.root.Favorites {
+		if f.ID == id {
+			found = true
+			continue
+		}
+		kept = append(kept, f)
+	}
+	if !found {
+		return fmt.Errorf("favorite %q not found", id)
+	}
+	s.root.Favorites = kept
+	return s.saveLocked()
+}
+
+// RecentFiles returns recently opened files, newest first.
+func (s *Store) RecentFiles() []RecentFile {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	out := make([]RecentFile, len(s.root.RecentFiles))
+	copy(out, s.root.RecentFiles)
+	sort.Slice(out, func(i, j int) bool { return out[i].OpenedAt.After(out[j].OpenedAt) })
+	return out
+}
+
+// AddRecentFile records an opened remote file, keeping the 30 most recent.
+func (s *Store) AddRecentFile(connID, path string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	rec := RecentFile{ConnectionID: connID, Path: path, OpenedAt: time.Now().UTC()}
+	kept := make([]RecentFile, 0, len(s.root.RecentFiles)+1)
+	kept = append(kept, rec)
+	for _, r := range s.root.RecentFiles {
+		if r.ConnectionID == connID && r.Path == path {
+			continue
+		}
+		kept = append(kept, r)
+	}
+	if len(kept) > 30 {
+		kept = kept[:30]
+	}
+	s.root.RecentFiles = kept
+	return s.saveLocked()
 }
 
 // AddRecent records a visited remote directory, keeping the 50 most recent.

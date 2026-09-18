@@ -8,6 +8,7 @@ require (
 	github.com/pkg/sftp v1.13.9
 	github.com/zalando/go-keyring v0.2.6
 	golang.org/x/crypto v0.31.0
+	golang.org/x/term v0.25.0
 )
 
 require (
@@ -16,7 +17,6 @@ require (
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/kr/fs v0.1.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/term v0.25.0 // indirect
 )
 
 replace golang.org/x/crypto => github.com/golang/crypto v0.26.0

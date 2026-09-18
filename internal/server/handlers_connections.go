@@ -162,6 +162,8 @@ func (s *Server) handleSessions(w http.ResponseWriter, r *http.Request) {
 // /api/sessions/{id}/remove
 // /api/sessions/{id}/rename
 // /api/sessions/{id}/chmod
+// /api/sessions/{id}/copy
+// /api/sessions/{id}/search
 // /api/sessions/{id}/upload
 // /api/sessions/{id}/download?path=
 // /api/sessions/{id}/preview?path=
@@ -205,6 +207,10 @@ func (s *Server) handleSessionItem(w http.ResponseWriter, r *http.Request) {
 		s.handleStat(w, r, sessionID)
 	case "mkdir", "remove", "rename", "chmod":
 		s.handleFileOp(w, r, sessionID, action)
+	case "copy":
+		s.handleCopy(w, r, sessionID)
+	case "search":
+		s.handleSearch(w, r, sessionID)
 	case "upload":
 		s.handleUpload(w, r, sessionID)
 	case "download":

@@ -2,7 +2,10 @@ package server
 
 import (
 	"encoding/json"
+	"io/fs"
 	"net/http"
+
+	"remorasftp/internal/events"
 )
 
 // mux builds the HTTP routing table.
@@ -29,11 +32,37 @@ func (s *Server) mux(auth *authState) {
 	mux.HandleFunc("/api/transfers", s.handleTransfers)
 	mux.HandleFunc("/api/transfers/", s.handleTransferItem)
 
+	mux.HandleFunc("/api/favorites", s.handleFavorites)
+	mux.HandleFunc("/api/favorites/", s.handleFavoriteItem)
+	mux.HandleFunc("/api/recents", s.handleRecents)
+
+	mux.HandleFunc("/api/local", s.handleLocal)
+	mux.HandleFunc("/api/local/", s.handleLocal)
+
 	mux.HandleFunc("/api/events", s.handleEvents)
 
 	// Embedded single-page application for everything else.
+	// The embed directive in assets.go captures webassets/ at compile
+	// time: if the frontend was not built (cd web && npm run build)
+	// before the Go binary was compiled, index.html is absent from the
+	// embed. That must be a loud, actionable 503 — not an opaque 404
+	// that looks like a routing bug.
 	assets, err := webAssets()
+	uiMissing := err != nil
 	if err == nil {
+		if _, serr := fs.Stat(assets, "index.html"); serr != nil {
+			uiMissing = true
+		}
+	}
+	if uiMissing {
+		if s.bus != nil {
+			s.bus.Info(events.TypeWarning,
+				"embedded web UI is missing (index.html) — run 'cd web && npm run build', then rebuild the Go binary")
+		}
+		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "embedded web UI is missing (index.html) — run 'cd web && npm run build', then rebuild the Go binary", http.StatusServiceUnavailable)
+		})
+	} else {
 		spa := &spaHandler{assets: assets}
 		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			spa.ServeHTTP(w, r)

@@ -5,7 +5,7 @@ import { EngineScreen } from './views/EngineScreen';
 import { Onboarding } from './views/Onboarding';
 import { Sidebar } from './components/Sidebar';
 import { TopBar } from './components/TopBar';
-import { FilesView } from './views/FilesView';
+import { FileManager } from './fm/FileManager';
 import { TransfersView } from './views/TransfersView';
 import { ActivityView } from './views/ActivityView';
 import { SecurityView } from './views/SecurityView';
@@ -91,7 +91,7 @@ export function App() {
         />
         <main className="main" role="main">
           {showOnboarding && <Onboarding onCreate={() => setCreatingConnection(true)} />}
-          {!showOnboarding && view === 'files' && <FilesView />}
+          {!showOnboarding && view === 'files' && <FileManager onNavigate={(v) => setView(v as View)} />}
           {!showOnboarding && view === 'connections' && (
             <ConnectionsView onEdit={(id) => setEditingConnection(id)} onCreate={() => setCreatingConnection(true)} />
           )}

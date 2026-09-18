@@ -16,6 +16,7 @@ import (
 	"remorasftp/internal/apppaths"
 	"remorasftp/internal/config"
 	"remorasftp/internal/events"
+	"remorasftp/internal/localfs"
 	"remorasftp/internal/manager"
 	"remorasftp/internal/transfers"
 	"remorasftp/internal/version"
@@ -25,11 +26,12 @@ import (
 
 // Server is the local loopback HTTP/WebSocket server.
 type Server struct {
-	auth *authState
-	cfg  *config.Store
-	mgr  *manager.Manager
-	tm   *transfers.Manager
-	bus  *events.Bus
+	auth  *authState
+	cfg   *config.Store
+	mgr   *manager.Manager
+	tm    *transfers.Manager
+	bus   *events.Bus
+	local *localfs.Service
 
 	listener   net.Listener
 	httpSrv    *http.Server
@@ -60,6 +62,7 @@ func New(opts Options) *Server {
 		mgr:       opts.Manager,
 		tm:        opts.Transfers,
 		bus:       opts.Bus,
+		local:     localfs.New(),
 		wsClients: map[*websocket.Conn]struct{}{},
 		startTime: time.Now(),
 		wsUpgrader: websocket.Upgrader{
