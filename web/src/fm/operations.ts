@@ -88,7 +88,7 @@ export interface PlanResult {
  * - `cut` moves; otherwise copies.
  * - For folders: if the destination folder already exists, the source folder
  *   is merged into it (its name is appended to destDir only when it does not
- *   exist) — the same rule as Explorer.
+ *   exist) - the same rule as Explorer.
  * - Returns `error` when the operation is impossible (e.g. moving a folder
  *   into its own subtree, or pasting into a path inside the source).
  */
@@ -224,7 +224,7 @@ export function typeLabel(e: Entry, t: (key: string) => string): string {
 }
 
 export function fileKilobytes(e: Entry): string {
-  return e.type === 'dir' ? '—' : String(e.size);
+  return e.type === 'dir' ? '-' : String(e.size);
 }
 
 export function parentOf(path: string): string {

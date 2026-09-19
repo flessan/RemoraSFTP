@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-// fakeApp builds a minimal App (events channel only) for parser tests — no
+// fakeApp builds a minimal App (events channel only) for parser tests - no
 // terminal is required.
 func fakeApp() *App {
 	return &App{events: make(chan Event, 64)}
@@ -60,7 +60,7 @@ func TestParseCtrlKeys(t *testing.T) {
 func TestParseEscape(t *testing.T) {
 	a := fakeApp()
 	// A lone ESC is ambiguous (it may start a sequence), so the parser only
-	// emits it once it sees the next byte — double ESC yields one Escape.
+	// emits it once it sees the next byte - double ESC yields one Escape.
 	// (A trailing lone ESC is flushed by the read loop after 30ms of quiet.)
 	evs := feedBytes(t, a, []byte{0x1b, 0x1b})
 	if len(evs) != 1 || evs[0].Key.Action != KeyEsc {

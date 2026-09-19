@@ -133,7 +133,7 @@ make lint         # go vet + gofmt + frontend typecheck
 ```
 
 `make test` and `make build` build the frontend first, because the server
-package embeds `internal/server/webassets` at compile time — the SPA tests
+package embeds `internal/server/webassets` at compile time - the SPA tests
 and the shipped UI need a real `index.html` in that tree. On a fresh
 checkout (or any machine with a missing/partial `node_modules`), use
 `npm ci` before building so dependencies are installed from the lockfile:

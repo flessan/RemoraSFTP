@@ -7,7 +7,7 @@ import (
 )
 
 // moveFile renames src to dst, falling back to copy+unlink when src and dst
-// live on different filesystems (os.Rename returns EXDEV — e.g. the app data
+// live on different filesystems (os.Rename returns EXDEV - e.g. the app data
 // tmp area on one filesystem and the download destination on another).
 func moveFile(src, dst string) error {
 	if err := os.Rename(src, dst); err == nil {

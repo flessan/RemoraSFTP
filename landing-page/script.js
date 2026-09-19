@@ -1,5 +1,5 @@
 /* ============================================================
-   RemoraSFTP landing page — redesigned
+   RemoraSFTP landing page - redesigned
    nav · scroll spy · reveal · counters · copy/toast · theme
    OS detection · FAQ · live terminal · command palette
    Three.js hero (unchanged behavior, graceful fallback)
@@ -24,12 +24,12 @@
   function applyTheme(theme) {
     root.setAttribute('data-theme', theme);
     if (metaTheme) metaTheme.setAttribute('content', theme === 'dark' ? '#0a1219' : '#f5f8f9');
-    try { localStorage.setItem('remora-theme', theme); } catch (e) {}
+    try { localStorage.setItem('remora-theme', theme); } catch (e) { }
   }
   try {
     var savedTheme = localStorage.getItem('remora-theme');
     if (savedTheme === 'dark' || savedTheme === 'light') applyTheme(savedTheme);
-  } catch (e) {}
+  } catch (e) { }
 
   var themeBtn = $('#theme-toggle');
   if (themeBtn) {
@@ -62,7 +62,7 @@
       document.body.appendChild(ta);
       ta.select();
       try { document.execCommand('copy'); done(); }
-      catch (e) { toast('Copy failed — select the text manually'); }
+      catch (e) { toast('Copy failed - select the text manually'); }
       document.body.removeChild(ta);
     }
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -239,7 +239,7 @@
 
   var LIVE_SCRIPT = [
     { c: 'remorasftp connect production' },
-    { o: '✓ host key verified — saved to local trust store' },
+    { o: '✓ host key verified - saved to local trust store' },
     { o: '  connected · sftp · 10.40.0.12:/srv' },
     { c: 'remorasftp put ./build.tar.gz /srv/backups/' },
     { o: '↑ build.tar.gz  [████████████████████] 100% · 3.1 MB/s' },
@@ -330,18 +330,26 @@
     { label: 'Go to Comparison', tag: 'Section', run: function () { scrollToSel('#compare'); } },
     { label: 'Go to FAQ', tag: 'Section', run: function () { scrollToSel('#faq'); } },
     { label: 'Go to Download', tag: 'Section', run: function () { scrollToSel('#download'); } },
-    { label: 'Toggle dark / light theme', tag: 'Action', run: function () {
+    {
+      label: 'Toggle dark / light theme', tag: 'Action', run: function () {
         applyTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-      } },
-    { label: 'Copy: git clone RemoraSFTP', tag: 'Copy', run: function () {
+      }
+    },
+    {
+      label: 'Copy: git clone RemoraSFTP', tag: 'Copy', run: function () {
         copyText('git clone ' + GH_URL, 'Clone command copied');
-      } },
-    { label: 'Open GitHub repository', tag: 'Link', run: function () {
+      }
+    },
+    {
+      label: 'Open GitHub repository', tag: 'Link', run: function () {
         window.open(GH_URL, '_blank', 'noopener');
-      } },
-    { label: 'Open releases page', tag: 'Link', run: function () {
+      }
+    },
+    {
+      label: 'Open releases page', tag: 'Link', run: function () {
         window.open(RELEASES_URL, '_blank', 'noopener');
-      } }
+      }
+    }
   ];
 
   function renderPalette(query) {

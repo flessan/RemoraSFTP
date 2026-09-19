@@ -151,7 +151,7 @@ func (b *screenBase) tooSmall(c *Canvas) bool { return c.w < b.minW || c.h < b.m
 // drawTooSmall renders the standard "resize your terminal" notice.
 func (b *screenBase) drawTooSmall(c *Canvas) {
 	c.FillRect(0, 0, c.w, c.h, ColBg)
-	c.TextEllipsis(2, 2, c.w-4, "Terminal too small — RemoraSFTP needs at least "+
+	c.TextEllipsis(2, 2, c.w-4, "Terminal too small - RemoraSFTP needs at least "+
 		fmt.Sprintf("%dx%d", b.minW, b.minH), Style{FG: ColWarn, BG: ColBg})
 }
 
@@ -453,7 +453,7 @@ const (
 )
 
 // pasteTerminator is the bracketed-paste end marker (ESC [201 ~) with the
-// ESC excluded — the bytes that follow an ESC while pasting and must match
+// ESC excluded - the bytes that follow an ESC while pasting and must match
 // for the paste to end.
 const pasteTerminator = "[201~"
 
@@ -466,7 +466,7 @@ type inputReader struct {
 }
 
 // readLoop consumes raw terminal input and enqueues events. It terminates
-// when stdin is closed or the app stops — after the run loop ends the
+// when stdin is closed or the app stops - after the run loop ends the
 // process is leaving, so the loop is never waited on.
 //
 // A pending lone ESC (not yet part of a sequence) is flushed as an Escape
@@ -549,7 +549,7 @@ func (r *inputReader) feedEscPaste(b byte) {
 		return
 	}
 	// Not the terminator: the ESC and the buffered bytes were literal
-	// paste content — emit the buffered bytes as pasted text and
+	// paste content - emit the buffered bytes as pasted text and
 	// reprocess the deciding byte in normal paste mode.
 	for _, c := range r.pasteBuf {
 		if c >= 0x20 && c != 0x7f {
@@ -631,7 +631,7 @@ func (r *inputReader) feedNormal(b byte) {
 	case '\t':
 		r.emitKey(Key{Action: KeyTab})
 	case 0x0b, 0x0c, 0x1d:
-		// Ctrl+K / Ctrl+L / Ctrl+] — consume, no action
+		// Ctrl+K / Ctrl+L / Ctrl+] - consume, no action
 	case 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 		0x0e, 0x0f,
 		0x10, 0x11, 0x12, 0x13, 0x14, 0x15,
@@ -685,14 +685,14 @@ func (r *inputReader) dispatchCSI(final byte) {
 			mouse.Button = BtnLeft
 		}
 		if btn&0x20 != 0 {
-			return // drag/motion — not needed by the launcher
+			return // drag/motion - not needed by the launcher
 		}
 		r.a.emit(Event{Kind: EvMouse, Mouse: mouse})
 		return
 	}
 
 	if len(params) > 0 && params[0] == '?' {
-		return // mode set/reset (e.g. mouse enable) — nothing to do
+		return // mode set/reset (e.g. mouse enable) - nothing to do
 	}
 
 	num := 0
@@ -715,7 +715,7 @@ func (r *inputReader) dispatchCSI(final byte) {
 	case 'F':
 		r.emitKey(Key{Action: KeyEnd})
 	case 'u':
-		// kitty keyboard protocol — consume only.
+		// kitty keyboard protocol - consume only.
 	case '~':
 		switch num {
 		case 1, 7:

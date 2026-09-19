@@ -42,7 +42,7 @@ export function AddressBar({
 
   // If the list load of the requested path failed, the parent reverts the
   // path; invalid feedback is set here on Enter with a path that fails
-  // validation (empty segments etc.) — real server errors are toasted by
+  // validation (empty segments etc.) - real server errors are toasted by
   // the parent.
   const commit = () => {
     if (!draft.trim()) {

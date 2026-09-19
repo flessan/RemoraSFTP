@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RemoraSFTP — remote files, local by design</title>
+  <title>RemoraSFTP - remote files, local by design</title>
   <meta name="description" content="RemoraSFTP is a local-first SFTP, FTP and FTPS client. One Go binary runs a loopback-only server; the browser UI, terminal UI and CLI share a single engine. Credentials and trust decisions never leave your machine.">
-  <meta property="og:title" content="RemoraSFTP — remote files, local by design">
+  <meta property="og:title" content="RemoraSFTP - remote files, local by design">
   <meta property="og:description" content="A local-first SFTP, FTP and FTPS client. One Go binary, one shared engine, zero cloud dependencies.">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#0b141b" id="meta-theme">
@@ -69,7 +69,7 @@
           <h1>Remote files,<br><span class="accent">local by design.</span></h1>
           <p class="lede">
             RemoraSFTP is a single Go binary that runs a loopback-only server on your
-            machine. Its browser UI, terminal UI and CLI all share one engine — so SFTP,
+            machine. Its browser UI, terminal UI and CLI all share one engine - so SFTP,
             FTP and FTPS feel like one calm, fast file manager. Your credentials, host
             keys and trust decisions never leave the device.
           </p>
@@ -109,7 +109,7 @@
               <path d="M148 148c10-7 22-8 36-3" fill="none" stroke="#8ed4d8" stroke-width="2.5" stroke-linecap="round"/>
             </svg>
           </div>
-          <div class="hero-chip chip-a" aria-hidden="true"><span class="tick">✓</span> 127.0.0.1 — loopback only</div>
+          <div class="hero-chip chip-a" aria-hidden="true"><span class="tick">✓</span> 127.0.0.1 - loopback only</div>
           <div class="hero-chip chip-b" aria-hidden="true"><span class="tick">✓</span> host key verified</div>
           <div class="hero-chip chip-c" aria-hidden="true"><span class="tick">●</span> 0 bytes leave this device</div>
         </div>
@@ -126,7 +126,7 @@
           <p class="section-sub">
             A remote file manager that lives entirely on your machine. One executable
             starts a private, token-protected server on <code>127.0.0.1</code>; three
-            front doors — browser, terminal and command line — drive the same engine.
+            front doors - browser, terminal and command line - drive the same engine.
           </p>
         </header>
 
@@ -208,7 +208,7 @@
             <h3>Credentials &amp; trust, on device</h3>
             <p>Passwords, SSH keys and host-key trust decisions live in a local
                credential store. First contact with a server is an explicit trust choice
-               — never a silent accept.</p>
+               - never a silent accept.</p>
           </article>
           <article class="card reveal">
             <h3>Search &amp; previews</h3>
@@ -222,7 +222,7 @@
           </article>
           <article class="card reveal">
             <h3>English + Bahasa Indonesia</h3>
-            <p>The interface ships in both languages and switches at runtime — the whole
+            <p>The interface ships in both languages and switches at runtime - the whole
                UI, menus included, not just a string table bolted on later.</p>
           </article>
         </div>
@@ -236,7 +236,7 @@
           <div class="mock-window" role="img" aria-label="Stylized preview of the RemoraSFTP file manager">
             <div class="mock-titlebar">
               <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-              <span class="mock-title">RemoraSFTP — production · /srv/web</span>
+              <span class="mock-title">RemoraSFTP - production · /srv/web</span>
             </div>
             <div class="mock-body fm-mock">
               <aside class="mock-side">
@@ -248,9 +248,9 @@
                 <span class="mock-side-item dim"><i class="mdot"></i>~/Dropbox</span>
               </aside>
               <div class="mock-list">
-                <span class="mock-row"><i class="micon mf"></i><b>assets/</b><span>—</span></span>
-                <span class="mock-row"><i class="micon mf"></i><b>docs/</b><span>—</span></span>
-                <span class="mock-row"><i class="micon mf"></i><b>logs/</b><span>—</span></span>
+                <span class="mock-row"><i class="micon mf"></i><b>assets/</b><span>-</span></span>
+                <span class="mock-row"><i class="micon mf"></i><b>docs/</b><span>-</span></span>
+                <span class="mock-row"><i class="micon mf"></i><b>logs/</b><span>-</span></span>
                 <span class="mock-row"><i class="micon mfile"></i><b>index.html</b><span>4.2 KB</span></span>
                 <span class="mock-row selected"><i class="micon mfile"></i><b>release-notes.md</b><span>18 KB</span></span>
                 <span class="mock-row"><i class="micon mfile"></i><b>deploy.log</b><span>48 KB</span></span>
@@ -277,7 +277,7 @@
             <li>Inline rename and context actions on any row</li>
             <li>Preview text and images without downloading</li>
             <li>Operations resolved against safe-path rules before they run</li>
-            <li>Works on desktop and laptop — it is your own browser tab</li>
+            <li>Works on desktop and laptop - it is your own browser tab</li>
           </ul>
         </div>
       </div>
@@ -288,7 +288,7 @@
       <div class="container">
         <header class="section-head reveal">
           <p class="eyebrow">Every protocol, verified</p>
-          <h2>SFTP, FTP and FTPS — one connection model</h2>
+          <h2>SFTP, FTP and FTPS - one connection model</h2>
           <p class="section-sub">
             Different wire protocols, the same experience. Every connection is checked
             against your local trust store before a session starts.
@@ -301,7 +301,7 @@
             </div>
             <h3>SFTP over SSH</h3>
             <p>The default. SSH-2 sessions with host-key verification and key or password
-               authentication — the protocol production servers actually run.</p>
+               authentication - the protocol production servers actually run.</p>
           </article>
           <article class="proto-card reveal">
             <div class="proto-icon" aria-hidden="true">
@@ -309,7 +309,7 @@
             </div>
             <h3>FTP</h3>
             <p>Plain FTP for legacy and internal-only networks, handled with the same
-               transfer engine — including binary/ASCII correctness and long paths.</p>
+               transfer engine - including binary/ASCII correctness and long paths.</p>
           </article>
           <article class="proto-card reveal">
             <div class="proto-icon" aria-hidden="true">
@@ -317,12 +317,12 @@
             </div>
             <h3>FTPS over TLS</h3>
             <p>FTP wrapped in TLS with certificate trust management: pin a CA, inspect a
-               certificate, or explicitly trust a host — the choice is recorded locally.</p>
+               certificate, or explicitly trust a host - the choice is recorded locally.</p>
           </article>
         </div>
         <p class="proto-note reveal">
           SSH host keys and TLS certificates are verified before a session starts. What
-          you trust is stored on your device — and shown to you again when it changes.
+          you trust is stored on your device - and shown to you again when it changes.
         </p>
       </div>
     </section>
@@ -335,7 +335,7 @@
           <h2>The terminal is a front door, not an afterthought</h2>
           <p>
             Run <code>remorasftp</code> with no arguments and the interactive terminal UI
-            opens — connections, file browsing, transfers and search, keyboard-first.
+            opens - connections, file browsing, transfers and search, keyboard-first.
             Prefer one-liners? The same engine powers the one-shot commands.
           </p>
           <div class="code" id="code-tui">
@@ -350,12 +350,12 @@
           <ul class="check-list">
             <li>Interactive launcher: browse, transfer and search from the keyboard</li>
             <li>One-shot commands: <code>connect · ls · put · get · mkdir · rm · mv</code></li>
-            <li>Identical services to the browser — no CLI-only quirks</li>
+            <li>Identical services to the browser - no CLI-only quirks</li>
           </ul>
         </div>
         <div class="tui-visual reveal">
           <div class="terminal" role="img" aria-label="Stylized preview of the RemoraSFTP terminal UI">
-            <div class="terminal-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>remorasftp — production</span></div>
+            <div class="terminal-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>remorasftp - production</span></div>
 <pre class="terminal-body">┌ RemoraSFTP ─────────────────────────────────────────────┐
 │ Connections                                             │
 │ > production   sftp   10.40.0.12   /srv                 │
@@ -376,7 +376,7 @@
       </div>
       <div class="container term-live-wrap reveal" id="term-wrap">
         <div class="terminal term-live">
-          <div class="terminal-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>remorasftp — live session</span><span class="live-dot" aria-hidden="true"></span></div>
+          <div class="terminal-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>remorasftp - live session</span><span class="live-dot" aria-hidden="true"></span></div>
 <pre class="terminal-body"><code id="term-text"></code><span class="term-cursor" aria-hidden="true"></span></pre>
         </div>
       </div>
@@ -390,7 +390,7 @@
           <h2>One binary per platform, nothing else to install</h2>
           <p class="section-sub">
             No runtime, no installer, no background service. Windows ships a
-            <code>.zip</code>; macOS and Linux ship <code>.tar.gz</code> — every release
+            <code>.zip</code>; macOS and Linux ship <code>.tar.gz</code> - every release
             includes SHA-256 checksums.
           </p>
         </header>
@@ -405,13 +405,13 @@
             <svg class="os-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.7 12.9c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.9-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8-.1 0-2.6-1-2.6-3.8zM14.4 5.6c.6-.8 1.1-1.9 1-3-.9 0-2.1.6-2.7 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2-.5 2.7-1.3z"/></svg>
             <h3>macOS</h3>
             <p>Apple Silicon and Intel builds. Native experience in Terminal, browser UI
-               in any modern browser — no Gatekeeper surprises: it is a plain binary.</p>
+               in any modern browser - no Gatekeeper surprises: it is a plain binary.</p>
           </article>
           <article class="os-card reveal">
             <svg class="os-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c-1.7 0-3 1.6-3 3.6 0 1.2.3 2.2.8 3-.9.5-1.8 1.4-2.4 2.5-.7-1.1-1.9-2-3.4-2.2.3 1 .2 2.1-.2 3.1-.4.9-1 1.8-1 2.9 0 1 .5 2 1.3 2.7-.1.5-.2 1-.2 1.5 0 2.3 1.7 4 3.8 4 .9 0 1.7-.3 2.3-.8.7.5 1.5.8 2.3.8 2.1 0 3.8-1.7 3.8-4 0-.5-.1-1-.2-1.5.8-.7 1.3-1.7 1.3-2.7 0-1.1-.6-2-1-2.9-.4-1-.5-2.1-.2-3.1-1.5.2-2.7 1.1-3.4 2.2-.5-.8-1.4-1.7-2.3-2.2.5-.8.8-1.8.8-3C15 3.6 13.7 2 12 2z"/></svg>
             <h3>Linux</h3>
             <p>A statically built amd64 binary for any modern distribution. The TUI
-               works over SSH as well — a remote file manager from a remote shell.</p>
+               works over SSH as well - a remote file manager from a remote shell.</p>
           </article>
         </div>
       </div>
@@ -428,7 +428,7 @@
           <article class="card sec-card reveal">
             <h3>Loopback-only by default</h3>
             <p>The local server binds <code>127.0.0.1</code>. Nothing listens on your
-               LAN, Wi-Fi or WAN unless you explicitly opt in — and even then it stays
+               LAN, Wi-Fi or WAN unless you explicitly opt in - and even then it stays
                token-protected.</p>
           </article>
           <article class="card sec-card reveal">
@@ -444,7 +444,7 @@
           <article class="card sec-card reveal">
             <h3>Verified connections</h3>
             <p>SSH host keys and TLS certificates are verified against a local trust
-               store. When a key changes, you are asked — trust is never silently
+               store. When a key changes, you are asked - trust is never silently
                re-granted.</p>
           </article>
           <article class="card sec-card reveal">
@@ -482,17 +482,17 @@
               </tr>
             </thead>
             <tbody>
-              <tr><th scope="row">Credentials stored on your device</th><td class="hl good">✓</td><td class="bad">—</td><td class="good">✓</td></tr>
-              <tr><th scope="row">No account or sign-up required</th><td class="hl good">✓</td><td class="bad">—</td><td class="part">±</td></tr>
-              <tr><th scope="row">GUI, TUI and CLI from one engine</th><td class="hl good">✓</td><td class="bad">—</td><td class="bad">—</td></tr>
-              <tr><th scope="row">No telemetry, no phone-home</th><td class="hl good">✓</td><td class="bad">—</td><td class="part">±</td></tr>
-              <tr><th scope="row">Works on air-gapped / offline LANs</th><td class="hl good">✓</td><td class="bad">—</td><td class="good">✓</td></tr>
-              <tr><th scope="row">Single static binary, no installer</th><td class="hl good">✓</td><td class="bad">—</td><td class="bad">—</td></tr>
-              <tr><th scope="row">Open source</th><td class="hl good">✓</td><td class="bad">—</td><td class="part">±</td></tr>
+              <tr><th scope="row">Credentials stored on your device</th><td class="hl good">✓</td><td class="bad">-</td><td class="good">✓</td></tr>
+              <tr><th scope="row">No account or sign-up required</th><td class="hl good">✓</td><td class="bad">-</td><td class="part">±</td></tr>
+              <tr><th scope="row">GUI, TUI and CLI from one engine</th><td class="hl good">✓</td><td class="bad">-</td><td class="bad">-</td></tr>
+              <tr><th scope="row">No telemetry, no phone-home</th><td class="hl good">✓</td><td class="bad">-</td><td class="part">±</td></tr>
+              <tr><th scope="row">Works on air-gapped / offline LANs</th><td class="hl good">✓</td><td class="bad">-</td><td class="good">✓</td></tr>
+              <tr><th scope="row">Single static binary, no installer</th><td class="hl good">✓</td><td class="bad">-</td><td class="bad">-</td></tr>
+              <tr><th scope="row">Open source</th><td class="hl good">✓</td><td class="bad">-</td><td class="part">±</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="cmp-note reveal">✓ yes · — no · ± depends on the tool</p>
+        <p class="cmp-note reveal">✓ yes · - no · ± depends on the tool</p>
       </div>
     </section>
 
@@ -502,7 +502,7 @@
         <header class="section-head reveal">
           <p class="eyebrow">Product showcase</p>
           <h2>Three surfaces, one engine</h2>
-          <p class="section-sub">Stylized interface previews — the browser manager, live
+          <p class="section-sub">Stylized interface previews - the browser manager, live
              transfers, and the terminal UI.</p>
         </header>
         <div class="show-grid">
@@ -511,8 +511,8 @@
               <div class="mock-titlebar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
               <div class="mock-body mini-body">
                 <div class="mock-list only">
-                  <span class="mock-row"><i class="micon mf"></i><b>assets/</b><span>—</span></span>
-                  <span class="mock-row"><i class="micon mf"></i><b>docs/</b><span>—</span></span>
+                  <span class="mock-row"><i class="micon mf"></i><b>assets/</b><span>-</span></span>
+                  <span class="mock-row"><i class="micon mf"></i><b>docs/</b><span>-</span></span>
                   <span class="mock-row selected"><i class="micon mfile"></i><b>index.html</b><span>4.2 KB</span></span>
                   <span class="mock-row"><i class="micon mfile"></i><b>deploy.log</b><span>48 KB</span></span>
                 </div>
@@ -601,7 +601,7 @@ RemoraSFTP 0.1.0
           </div>
           <div class="reveal">
             <h3>Prefer to build it yourself?</h3>
-            <p>The whole product is open source — the Go engine, the React browser UI
+            <p>The whole product is open source - the Go engine, the React browser UI
                and the TUI. Building from source needs Go and Node:</p>
             <div class="code" id="code-source">
               <button class="copy-btn" type="button" aria-label="Copy commands"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span></button>
@@ -624,7 +624,7 @@ RemoraSFTP 0.1.0
         <div class="faq-list reveal">
           <div class="faq-item">
             <button class="faq-q" type="button" aria-expanded="false">Does anything I transfer pass through your servers?<span class="chev" aria-hidden="true">▾</span></button>
-            <div class="faq-a"><div><p>No. RemoraSFTP connects directly from your machine to the remote host you choose. The project operates no relay, sync or storage servers — there is simply nowhere for your data to detour through.</p></div></div>
+            <div class="faq-a"><div><p>No. RemoraSFTP connects directly from your machine to the remote host you choose. The project operates no relay, sync or storage servers - there is simply nowhere for your data to detour through.</p></div></div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button" aria-expanded="false">Why does a file client start a local server?<span class="chev" aria-hidden="true">▾</span></button>
@@ -632,11 +632,11 @@ RemoraSFTP 0.1.0
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button" aria-expanded="false">Can other devices on my network reach the UI?<span class="chev" aria-hidden="true">▾</span></button>
-            <div class="faq-a"><div><p>Not by default. The server is loopback-only unless you explicitly enable LAN access — and even then every request must carry the session token and pass origin checks.</p></div></div>
+            <div class="faq-a"><div><p>Not by default. The server is loopback-only unless you explicitly enable LAN access - and even then every request must carry the session token and pass origin checks.</p></div></div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button" aria-expanded="false">Which authentication methods are supported for SFTP?<span class="chev" aria-hidden="true">▾</span></button>
-            <div class="faq-a"><div><p>Passwords and SSH keys — including keys from <code>ssh-agent</code> — over SSH-2. Host keys are verified against your local trust store; a changed key always triggers an explicit prompt, never a silent accept.</p></div></div>
+            <div class="faq-a"><div><p>Passwords and SSH keys - including keys from <code>ssh-agent</code> - over SSH-2. Host keys are verified against your local trust store; a changed key always triggers an explicit prompt, never a silent accept.</p></div></div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button" aria-expanded="false">Can I run it on a headless server?<span class="chev" aria-hidden="true">▾</span></button>
@@ -657,7 +657,7 @@ RemoraSFTP 0.1.0
           <div>
             <h2>Open source, built in the open</h2>
             <p>Issues, ideas and pull requests live on GitHub. The landing page you are
-               reading is static files in the same repository — deployable anywhere.</p>
+               reading is static files in the same repository - deployable anywhere.</p>
           </div>
           <a class="btn btn-light" href="https://github.com/34labs/RemoraSFTP-dev" target="_blank" rel="noopener">
             Star RemoraSFTP on GitHub

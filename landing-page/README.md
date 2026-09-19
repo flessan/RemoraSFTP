@@ -1,6 +1,6 @@
-# RemoraSFTP — landing page
+# RemoraSFTP - landing page
 
-Static marketing site for RemoraSFTP. Plain HTML/CSS/JS — no React, no Vite,
+Static marketing site for RemoraSFTP. Plain HTML/CSS/JS - no React, no Vite,
 no build step, no Go code, and no coupling to the application frontend in
 [`/web`](../web). The Three.js hero is loaded from a CDN via dynamic import
 and degrades to a static SVG scene when WebGL or the CDN is unavailable.

@@ -40,7 +40,7 @@ func cspForApp() string {
 
 // spaHandler serves the built single-page application.
 //
-// The browser opens client-side routes directly — the launcher hands it a
+// The browser opens client-side routes directly - the launcher hands it a
 // URL such as /bootstrap/<code>. None of those map to a real file in the
 // embedded bundle, so they must return index.html (the SPA shell) rather
 // than a 404 or a redirect. Genuinely-missing hashed assets under /assets/
@@ -94,7 +94,7 @@ func (h *spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	// ServeContent streams the embedded file without the directory/canonical
-	// redirect logic of http.FileServer — so /bootstrap/<code> returns the
+	// redirect logic of http.FileServer - so /bootstrap/<code> returns the
 	// shell with HTTP 200, not a 301.
 	rs, ok := f.(io.ReadSeeker)
 	if !ok {

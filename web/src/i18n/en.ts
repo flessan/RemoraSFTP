@@ -184,7 +184,7 @@ export const en = {
     pasteSelf: 'An item cannot be moved into itself.',
     pasteInsideSource: 'The destination is inside one of the selected items.',
     pasteNoop: 'Nothing to paste here.',
-    operationQueued: 'Operation queued — follow progress in Transfers.',
+    operationQueued: 'Operation queued - follow progress in Transfers.',
     selected: '{{count}} selected · {{size}}',
     clipboardCut: '{{count}} item(s) cut',
     clipboardCopied: '{{count}} item(s) copied',

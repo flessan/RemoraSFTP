@@ -13,7 +13,7 @@
 // If the failure reproduces, the trace output pinpoints the exact stage at
 // which the pipeline diverges (FakeFS, copyFile, path calculation, worker,
 // or session/client wiring). The assertions themselves are the same invariants
-// the regular copy tests check — nothing is weakened.
+// the regular copy tests check - nothing is weakened.
 package transfers
 
 import (

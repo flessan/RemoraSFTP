@@ -105,7 +105,7 @@ func TestCopyFileAndTree(t *testing.T) {
 	if snap.Status != StatusCompleted {
 		t.Fatalf("status = %s, err=%q", snap.Status, snap.Error)
 	}
-	// Regression: recursive copy destinations must be under /dst/src —
+	// Regression: recursive copy destinations must be under /dst/src -
 	// the target variable in the directory branch must not be shadowed,
 	// which used to send every child to the filesystem root.
 	if string(fs.Read("/dst/src/a.txt")) != "alpha" {
@@ -221,7 +221,7 @@ func TestCopyFolderPolicies(t *testing.T) {
 	_, tm, sess := newTestManager(t, fs)
 
 	// rename: an existing same-named destination folder must NOT be merged
-	// into — a sibling "src (1)" is created instead.
+	// into - a sibling "src (1)" is created instead.
 	fs.Add("/src", true, nil)
 	fs.Add("/src/a.txt", false, []byte("a"))
 	fs.Add("/dst", true, nil)

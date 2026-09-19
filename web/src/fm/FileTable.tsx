@@ -126,17 +126,17 @@ export function FileTable(props: FileTableProps) {
       case 'size':
         return (
           <span className="muted mono" style={{ fontSize: 12.5 }}>
-            {e.type === 'dir' ? '—' : formatBytes(e.size)}
+            {e.type === 'dir' ? '-' : formatBytes(e.size)}
           </span>
         );
       case 'date':
         return <span className="muted" style={{ fontSize: 12.5 }}>{formatDate(e.modTime)}</span>;
       case 'permissions':
-        return <span className="mono muted" style={{ fontSize: 12 }}>{e.permissions || '—'}</span>;
+        return <span className="mono muted" style={{ fontSize: 12 }}>{e.permissions || '-'}</span>;
       case 'owner':
-        return <span className="muted" style={{ fontSize: 12.5 }}>{e.owner || '—'}</span>;
+        return <span className="muted" style={{ fontSize: 12.5 }}>{e.owner || '-'}</span>;
       case 'group':
-        return <span className="muted" style={{ fontSize: 12.5 }}>{e.group || '—'}</span>;
+        return <span className="muted" style={{ fontSize: 12.5 }}>{e.group || '-'}</span>;
     }
   };
 
@@ -197,9 +197,8 @@ export function FileTable(props: FileTableProps) {
               <tr
                 key={e.path}
                 data-path={e.path}
-                className={`file-row ${isSel ? 'selected' : ''} ${isFocused ? 'focused' : ''} ${
-                  activePath === e.path ? 'active' : ''
-                } ${view === 'list' ? 'row-list' : ''}`}
+                className={`file-row ${isSel ? 'selected' : ''} ${isFocused ? 'focused' : ''} ${activePath === e.path ? 'active' : ''
+                  } ${view === 'list' ? 'row-list' : ''}`}
                 onClick={(ev) => onRowClick(e, i, ev)}
                 onDoubleClick={() => onOpen(e)}
                 onContextMenu={(ev) => {

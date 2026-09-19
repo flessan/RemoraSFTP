@@ -10,7 +10,7 @@ import (
 )
 
 // SearchQuery describes a remote file search. The search runs through the
-// protocol client (breadth-first) — the entire filesystem is never loaded
+// protocol client (breadth-first) - the entire filesystem is never loaded
 // into the browser.
 type SearchQuery struct {
 	Path          string // starting directory

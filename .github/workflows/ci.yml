@@ -18,7 +18,7 @@ concurrency:
 jobs:
   # Linux job: web build + full Go verification (gofmt, build, vet, test).
   web-and-go-linux:
-    name: Linux — web + Go
+    name: Linux - web + Go
     runs-on: ubuntu-latest
 
     steps:
@@ -79,7 +79,7 @@ jobs:
   # is independent of the Linux job so a failure on either OS is diagnosed
   # in its own log.
   windows:
-    name: Windows — web + Go
+    name: Windows - web + Go
     runs-on: windows-latest
 
     steps:
@@ -122,9 +122,9 @@ jobs:
 
   # Landing page job: the static marketing site under landing-page/ is its
   # own Cloudflare Pages project. This job only sanity-checks those static
-  # files — no Go, no web/ build, no coupling to the embedded frontend.
+  # files - no Go, no web/ build, no coupling to the embedded frontend.
   landing-page:
-    name: Landing page — static sanity
+    name: Landing page - static sanity
     runs-on: ubuntu-latest
 
     steps:
@@ -191,7 +191,7 @@ jobs:
           print('landing-page: HTML tag balance OK, all local assets present')
           PY
           # Isolation: the marketing site must stay framework/Go-free.
-          # (grep the actual code files only — not prose in README.md)
+          # (grep the actual code files only - not prose in README.md)
           if grep -rn 'go:embed' landing-page; then
             echo "landing-page must not contain go:embed"
             exit 1

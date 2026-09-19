@@ -30,7 +30,7 @@ func (s *Server) handleSettings(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// POST /api/onboarding  — mark first-run complete
+// POST /api/onboarding  - mark first-run complete
 func (s *Server) handleOnboarding(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		writeErr(w, http.StatusMethodNotAllowed, "POST required")
@@ -101,7 +101,7 @@ func (s *Server) handleTransferItem(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// GET /api/events — WebSocket stream of bus events. The token is carried via
+// GET /api/events - WebSocket stream of bus events. The token is carried via
 // the Sec-WebSocket-Protocol subprotocol (never the URL query string).
 func (s *Server) handleEvents(w http.ResponseWriter, r *http.Request) {
 	up := s.wsUpgrader

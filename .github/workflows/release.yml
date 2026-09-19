@@ -131,9 +131,9 @@ jobs:
             dist/remorasftp-windows-amd64.zip
             dist/checksums.txt
           )
-          NOTES="RemoraSFTP ${TAG} — commit ${COMMIT}"
+          NOTES="RemoraSFTP ${TAG} - commit ${COMMIT}"
           if gh release view "$TAG" >/dev/null 2>&1; then
-            echo "Release $TAG exists — replacing assets…"
+            echo "Release $TAG exists - replacing assets…"
             gh release upload "$TAG" "${ASSETS[@]}" --clobber
           else
             echo "Creating release $TAG…"
@@ -271,9 +271,9 @@ jobs:
             dist/remorasftp-windows-amd64.zip
             dist/checksums.txt
           )
-          NOTES="RemoraSFTP ${TAG} — commit ${COMMIT}"
+          NOTES="RemoraSFTP ${TAG} - commit ${COMMIT}"
           if gh release view "$TAG" >/dev/null 2>&1; then
-            echo "Release $TAG exists — replacing assets…"
+            echo "Release $TAG exists - replacing assets…"
             gh release upload "$TAG" "${ASSETS[@]}" --clobber
           else
             echo "Creating release $TAG…"

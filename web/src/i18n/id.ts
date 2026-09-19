@@ -186,7 +186,7 @@ export const id: Messages = {
     pasteSelf: 'Item tidak dapat dipindahkan ke dirinya sendiri.',
     pasteInsideSource: 'Tujuan berada di dalam salah satu item yang dipilih.',
     pasteNoop: 'Tidak ada yang akan ditempel di sini.',
-    operationQueued: 'Operasi mengantre — ikuti progresnya di Transfer.',
+    operationQueued: 'Operasi mengantre - ikuti progresnya di Transfer.',
     selected: '{{count}} dipilih · {{size}}',
     clipboardCut: '{{count}} item dipotong',
     clipboardCopied: '{{count}} item disalin',

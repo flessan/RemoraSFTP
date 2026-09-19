@@ -4,7 +4,7 @@
 //
 // Security model: the local API is loopback-only and token-protected, so
 // this service is reachable exclusively by the user's own browser tabs on
-// this device — the same trust assumption the rest of the engine makes
+// this device - the same trust assumption the rest of the engine makes
 // about "the user's machine, operated by the user". All paths are cleaned;
 // NUL bytes and empty paths are rejected.
 package localfs

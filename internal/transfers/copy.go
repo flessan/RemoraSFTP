@@ -21,7 +21,7 @@ import (
 //
 // This orchestration lives in the transfers package (not manager) because
 // the job/queue it enqueues onto belong to the transfer subsystem, and
-// transfers already depends on manager — the reverse would be an import
+// transfers already depends on manager - the reverse would be an import
 // cycle. It reaches the session's protocol client and metadata through the
 // engine manager held by the transfer manager.
 //

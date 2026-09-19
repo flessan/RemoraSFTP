@@ -330,7 +330,7 @@ func titleBar(c *Canvas, title, sub string) {
 
 // rowAt maps a mouse click to a row index (or -1). Rows are drawn at
 // y0 + i*rowH; row i covers the lines [y0+i*rowH, y0+(i+1)*rowH), except
-// the last row, which covers only its own text line (y0+(count-1)*rowH) —
+// the last row, which covers only its own text line (y0+(count-1)*rowH) -
 // the trailing gap below the last row belongs to no row.
 func rowAt(mx, my, y0, rowH int, count int) int {
 	if my < y0 || count <= 0 {
@@ -414,7 +414,7 @@ func (m *mainMenu) Draw(c *Canvas) {
 	case engOurs:
 		c.Text(2, c.h-1, "● engine running at "+m.l.engineAddr(), Style{FG: ColOK, BG: ColBg})
 	case engExternal:
-		c.Text(2, c.h-1, "● engine already running (PID "+fmt.Sprint(m.l.extPID)+") — start disabled", Style{FG: ColWarn, BG: ColBg})
+		c.Text(2, c.h-1, "● engine already running (PID "+fmt.Sprint(m.l.extPID)+") - start disabled", Style{FG: ColWarn, BG: ColBg})
 	default:
 		c.Text(2, c.h-1, "engine stopped", Style{FG: ColFaint, BG: ColBg})
 	}
@@ -549,14 +549,14 @@ func (r *runningScreen) Draw(c *Canvas) {
 	}
 	l := r.l
 	c.Box(0, 0, c.w, c.h, Style{FG: ColBorder, BG: ColBg})
-	titleBar(c, "RemoraSFTP — Running", "local engine active")
+	titleBar(c, "RemoraSFTP - Running", "local engine active")
 
 	browserV, browserC := "Not opened (start without browser)", ColText
 	switch l.browserState {
 	case "opened":
 		browserV, browserC = "Opened", ColOK
 	case "failed":
-		browserV, browserC = "Launch failed — use [Open Browser]", ColWarn
+		browserV, browserC = "Launch failed - use [Open Browser]", ColWarn
 	}
 	rows := []infoRow{
 		{k: "Status", v: "● Running", col: ColOK},
@@ -726,7 +726,7 @@ func (s *errorScreen) Draw(c *Canvas) {
 		return
 	}
 	c.Box(0, 0, c.w, c.h, Style{FG: ColBorder, BG: ColBg})
-	titleBar(c, "Problem", "an action failed — details below")
+	titleBar(c, "Problem", "an action failed - details below")
 	lines := wrapText(s.msg, c.w-8)
 	y := 4
 	for _, ln := range lines {
@@ -770,7 +770,7 @@ type connRow struct {
 func (s *connectionsScreen) computeRows() []connRow {
 	var out []connRow
 	for _, p := range s.l.eng.Manager.Profiles() {
-		st := "—"
+		st := "-"
 		col := ColFaint
 		for _, sess := range s.l.eng.Manager.Sessions() {
 			if sess.ConnID == p.ID {
@@ -825,7 +825,7 @@ func (s *connectionsScreen) Draw(c *Canvas) {
 		return
 	}
 	c.Box(0, 0, c.w, c.h, Style{FG: ColBorder, BG: ColBg})
-	titleBar(c, "Connections", fmt.Sprintf("%d saved — shared with the browser UI", s.l.savedConnections()))
+	titleBar(c, "Connections", fmt.Sprintf("%d saved - shared with the browser UI", s.l.savedConnections()))
 
 	cols := []struct {
 		x int
@@ -1082,9 +1082,9 @@ func (s *trustScreen) Draw(c *Canvas) {
 		return
 	}
 	c.Box(0, 0, c.w, c.h, Style{FG: ColBorder, BG: ColBg})
-	trustSub := "unknown SSH host key — review the fingerprint"
+	trustSub := "unknown SSH host key - review the fingerprint"
 	if s.kind != "ssh" {
-		trustSub = "untrusted TLS certificate — review the fingerprint"
+		trustSub = "untrusted TLS certificate - review the fingerprint"
 	}
 	titleBar(c, "Verify server identity", trustSub)
 	y := 4
@@ -1170,7 +1170,7 @@ func (s *trustScreen) trust() {
 	}
 	sc := &connectionsScreen{l: s.l}
 	s.l.a.SetScreen(sc)
-	sc.setStatus("Identity trusted — connecting…", ColSubtle, false)
+	sc.setStatus("Identity trusted - connecting…", ColSubtle, false)
 	sc.connect(s.connID)
 }
 
@@ -1545,7 +1545,7 @@ func (s *settingsScreen) Draw(c *Canvas) {
 		c.Text(4, y, r.label, Style{FG: fg, BG: bg, Bold: i == s.idx})
 		c.Text(30, y, r.value, Style{FG: ColAccent2, BG: bg})
 		if r.warnAfter {
-			c.Text(30, y+1, "beyond loopback — use with care", Style{FG: ColFaint, BG: ColBg})
+			c.Text(30, y+1, "beyond loopback - use with care", Style{FG: ColFaint, BG: ColBg})
 		}
 	}
 	if s.msg != "" {
@@ -1638,7 +1638,7 @@ func (s *diagnosticsScreen) Draw(c *Canvas) {
 	listen, _, beyond := s.l.listenPlan()
 	listenV := listen + " (loopback)"
 	if beyond {
-		listenV = listen + " (BEYOND loopback — advanced)"
+		listenV = listen + " (BEYOND loopback - advanced)"
 	}
 
 	type kvRow struct {
@@ -1704,7 +1704,7 @@ func (s *aboutScreen) Draw(c *Canvas) {
 	c.Box(0, 0, c.w, c.h, Style{FG: ColBorder, BG: ColBg})
 	titleBar(c, "About RemoraSFTP", "version and build information")
 	lines := []string{
-		"RemoraSFTP — a local-first browser file manager for FTP, FTPS, and SFTP.",
+		"RemoraSFTP - a local-first browser file manager for FTP, FTPS, and SFTP.",
 		"",
 		fmt.Sprintf("Version %s  ·  commit %s", info.Version, info.Commit),
 		fmt.Sprintf("Built %s  ·  %s on %s/%s", info.BuildTime, info.GoVersion, info.OS, info.Arch),
