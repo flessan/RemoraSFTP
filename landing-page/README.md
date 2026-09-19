@@ -28,4 +28,4 @@ This directory is designed to be the Pages project root:
 Or connect the repo with the output directory set to `landing-page` and no
 build command. No server-side runtime or framework adapter is required.
 
-https://remorasftp.pages.dev
+https://remora-sftp.pages.dev
